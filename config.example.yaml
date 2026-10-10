@@ -1,0 +1,62 @@
+# CPA-Relay-Gateway 生产配置示例
+server:
+  port: 8787
+  host: "127.0.0.1"
+
+# 上游渠道定义（支持任意协议：openai_chat, claude_messages, gemini, openai_responses）
+channels:
+  # 商业 API 渠道示例（DeepSeek / 官方 OpenAI）
+  - name: "deepseek"
+    base_url: "https://api.deepseek.com"
+    api_key: "sk-xxxxxxxx"
+    protocol: "openai_chat"
+    models:
+      - "deepseek-chat"
+      - "deepseek-reasoner"
+
+  # 官方 Claude 商业渠道或反代渠道
+  - name: "upstream-claude"
+    base_url: "https://api.anthropic.com"
+    api_key: "sk-ant-xxxxxxxx"
+    protocol: "claude_messages"
+    models:
+      - "claude-3-7-sonnet"
+      - "claude-3-5-haiku"
+
+  # 官方 Google Gemini 渠道
+  - name: "upstream-gemini"
+    base_url: "https://generativelanguage.googleapis.com"
+    api_key: "AIzaSyxxxxxxxx"
+    protocol: "gemini"
+    models:
+      - "gemini-2.5-pro"
+      - "gemini-2.5-flash"
+
+# 原生本地 CPA 凭据池直连（不经过外部代理中转，直接读取本地 auths/*.json 调度官方端点）
+auth_pools:
+  - name: "cpa-grok-pool"
+    type: "xai"
+    auth_dir: "./auths"
+    models:
+      - "grok-3-mini"
+  - name: "cpa-antigravity-pool"
+    type: "antigravity"
+    auth_dir: "./auths"
+    models:
+      - "gemini-3.8-flash-high"
+      - "claude-sonnet-4-6"
+
+# 模型别名映射（客户端发请求时无需感知上游真实名称，改动此配置 0 停机热重载生效）
+model_mappings:
+  "my-claude":
+    target_model: "claude-3-7-sonnet"
+    channel: "upstream-claude"
+  "my-gemini":
+    target_model: "gemini-2.5-pro"
+    channel: "upstream-gemini"
+  "my-deepseek":
+    target_model: "deepseek-chat"
+    channel: "deepseek"
+  "my-codex":
+    target_model: "gpt-4o"
+    channel: "cpa-cluster"

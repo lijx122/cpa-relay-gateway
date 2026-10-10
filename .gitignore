@@ -1,0 +1,25 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Sensitive runtime configurations (contains production API keys and local paths)
+config.production.yaml
+config.yaml
+*.local.yaml
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# Temporary scripts and logs
+*.log
+*.tmp
+temp/
